@@ -19,12 +19,8 @@ def analyze_project(repo, grammar_file, tmp, output):
     """
     Analyze a single project
     """
-    token = "TOKEN_GIT"
     repo_id = repo['repo_id']
     repo_git = repo['url']
-
-    # Convertir la URL de HTTPS para incluir el token
-    repo_git = repo_git.replace("https://", f"https://{token}@")
 
     # Create folders
     os.makedirs(tmp, exist_ok=True)
@@ -408,52 +404,49 @@ def analyze_project_lines(repo_lines, grammar_file, tmp, output):
 	pool.join()
 
 def parse_args():
-	"""
-	Parse the args passed from the command line
-	"""
-	parser = argparse.ArgumentParser()
-	parser.add_argument(
-		"--repo_lines",
-		type=str,
-		default="repos.jsonl",
-		help="Path to the JSON lines file containing the repos to analyze",
-	)
-	parser.add_argument(
-		"--grammar",
-		type=str,
-		default="java-grammar.so",
-		help="Filepath of the tree-sitter grammar",
-	)
-	parser.add_argument(
-		"--tmp",
-		type=str,
-		default="/home/saranya/HDD18TB/LLM/LLM-for-Test-Case-Generation/tmp/",
-		help="Path to a temporary folder used for processing",
-	)
-	parser.add_argument(
-		"--output",
-		type=str,
-		default="/home/saranya/HDD18TB/LLM/LLM-for-Test-Case-Generation/tmp/output/",
-		help="Path to the output folder",
-	)
+    """
+    Parse the args passed from the command line
+    """
+    parser = argparse.ArgumentParser(description="Analyze Java repositories.")
+    parser.add_argument(
+        "--repo_lines",
+        type=str,
+        default="/home/czerga/cjudith/DataProcessing/Data/filtered_train.json",
+        help="Path to the JSON file containing the repos to analyze",
+    )
+    parser.add_argument(
+        "--grammar",
+        type=str,
+        default="/home/czerga/cjudith/DataProcessing/java-grammar.so",
+        help="Filepath of the tree-sitter grammar",
+    )
+    parser.add_argument(
+        "--tmp",
+        type=str,
+        default="/home/czerga/cjudith/DataProcessing/tmp/",
+        help="Path to a temporary folder used for processing",
+    )
+    parser.add_argument(
+        "--output",
+        type=str,
+        default="/home/czerga/cjudith/DataProcessing/tmp_output/",
+        help="Path to the output folder",
+    )
 
-	return vars(parser.parse_args())
+    return vars(parser.parse_args())
 
 def main():
-	global cwd
-	cwd = os.getcwd()
-	args = parse_args()
-	repo_lines = r"/home/czerga/DataProcessing/Data/split_train/filtered_train.json" #args['repo_lines']
-	grammar_file = r"/home/czerga/DataProcessing/java-grammar.so"  #args['grammar']
-	tmp = r"/home/czerga/DataProcessing/tmp/"  #args['tmp']
-	output = r"/home/czerga/DataProcessing/tmp_output/" 
- 
-	with open(repo_lines) as f:
-		# print(f.read())
-		data = json.load(f)
-		analyze_project_lines(data, grammar_file, tmp, output)
-  	 	
+    args = parse_args()
+    repo_lines = args['repo_lines']
+    grammar_file = args['grammar']
+    tmp = args['tmp']
+    output = args['output']
+
+    # Open and read the JSON file
+    with open(repo_lines, 'r') as f:
+        data = json.load(f)
+        analyze_project_lines(data, grammar_file, tmp, output)
 
 if __name__ == '__main__':
-	main()
+    main()
 	
